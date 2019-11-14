@@ -1,0 +1,69 @@
+{
+  "project_info": {
+    "project_number": "792699996489",
+    "firebase_url": "https://touchcarwash-7b4e7.firebaseio.com",
+    "project_id": "touchcarwash-7b4e7",
+    "storage_bucket": "touchcarwash-7b4e7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:792699996489:android:24970549bca4e9e3acf298",
+        "android_client_info": {
+          "package_name": "com.touchcarwash_driver"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "792699996489-r5hho1rm25va6267tcterf5com0qhl0t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB4_0Tf8RmgG-uh4d90ls-0q-svfMnUt74"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "792699996489-r5hho1rm25va6267tcterf5com0qhl0t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:792699996489:android:e500c95728aad962acf298",
+        "android_client_info": {
+          "package_name": "com.touchcarwashadmin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "792699996489-r5hho1rm25va6267tcterf5com0qhl0t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB4_0Tf8RmgG-uh4d90ls-0q-svfMnUt74"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "792699996489-r5hho1rm25va6267tcterf5com0qhl0t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

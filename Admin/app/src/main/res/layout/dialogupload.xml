@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/roundedcornerbackground">
+
+    <RelativeLayout
+        android:id="@+id/uploadlayout"
+        android:layout_width="fill_parent"
+        android:layout_height="60.0dip"
+        android:padding="5.0dip">
+
+        <RelativeLayout
+            android:id="@+id/persentagelayout"
+            android:layout_width="60.0dip"
+            android:layout_height="60.0dip"
+            android:layout_marginLeft="10.0dip">
+
+            <ProgressBar
+                android:id="@+id/pb1"
+                style="?android:progressBarStyleLarge"
+                android:layout_width="60.0dip"
+                android:layout_height="60.0dip"
+                android:layout_centerVertical="true"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/persentage"
+                style="@style/Base.TextAppearance.AppCompat.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text=""
+                android:textColor="#ff000000"
+                android:visibility="gone" />
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/txtlaoding"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="15.0dip"
+            android:layout_toLeftOf="@+id/stop"
+            android:layout_toRightOf="@+id/persentagelayout"
+            android:text="Please wait..."
+            android:textColor="#ff000000" />
+
+        <Button
+            android:id="@+id/stop"
+            android:layout_width="100.0dip"
+            android:layout_height="40.0dip"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_margin="5.0dip"
+            android:background="@drawable/roundedcornerbutton"
+            android:text="Stop"
+            android:textColor="#ffffffff"
+            android:textSize="14.0dip" />
+    </RelativeLayout>
+</RelativeLayout>

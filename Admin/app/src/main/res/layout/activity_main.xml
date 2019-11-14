@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#515151"
+    tools:context=".MainActivity">
+
+    <RelativeLayout
+        android:id="@+id/header"
+        android:layout_width="fill_parent"
+        android:layout_height="50.0dip"
+        android:background="@drawable/titlebargradiant">
+
+        <ImageView
+            android:id="@+id/logo"
+            android:layout_width="20.0dip"
+            android:layout_height="20.0dip"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="3.0dip"
+            android:scaleType="fitXY"
+            android:src="@drawable/logo" />
+
+        <TextView
+            android:id="@+id/text"
+            style="@android:style/TextAppearance.Medium"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10.0dip"
+            android:layout_toRightOf="@+id/logo"
+            android:text="Admin"
+            android:textColor="#fff" />
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="#fff"
+        android:layout_below="@+id/header">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:stretchColumns="*"
+                >
+
+                <TableRow>
+
+                    <ImageView
+                        android:id="@+id/washvehicles"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
+                        android:src="@drawable/washvehicles"
+                        android:layout_margin="10dp"
+                        />
+
+                    <ImageView
+                        android:id="@+id/drivers"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
+                        android:src="@drawable/drivers"
+                        android:layout_margin="10dp"
+                        />
+
+                </TableRow>
+
+
+                <TableRow>
+
+                    <ImageView
+                        android:id="@+id/vehicles"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
+                        android:src="@drawable/vehicles"
+                        android:layout_margin="10dp"
+                        />
+
+                    <ImageView
+                        android:id="@+id/offer"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
+                        android:src="@drawable/offers"
+                        android:layout_margin="10dp"
+                        />
+
+                </TableRow>
+
+                <TableRow>
+
+                    <ImageView
+                        android:id="@+id/prices"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
+                        android:src="@drawable/prices"
+                        android:layout_margin="10dp"
+                        />
+
+                </TableRow>
+
+            </TableLayout>
+
+        </RelativeLayout>
+    </ScrollView>
+
+</RelativeLayout>

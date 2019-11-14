@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="none">
+        <item
+            android:id="@+id/myprofile"
+            android:icon="@drawable/profile"
+            android:title="My Profile" />
+        <item
+            android:id="@+id/myjobs"
+            android:icon="@drawable/myjobs"
+            android:title="My Jobs" />
+        <item
+            android:id="@+id/myavailability"
+            android:icon="@drawable/availaibility"
+            android:title="My Availability" />
+        <item
+            android:id="@+id/managegallery"
+            android:icon="@drawable/gallery"
+            android:title="Manage Gallery" />
+        <item
+            android:id="@+id/accounts"
+            android:icon="@drawable/accounts"
+            android:title="Accounts" />
+
+    </group>
+    <item android:title="Communicate">
+        <menu>
+            <item
+                android:id="@+id/notificationissue"
+                android:icon="@drawable/notierror"
+                android:title="Notification Issue ?" />
+            <item
+                android:id="@+id/rpt_update"
+                android:icon="@drawable/update"
+                android:title="Update App" />
+            <item
+                android:id="@+id/admin"
+                android:icon="@drawable/admin"
+                android:title="Admin" />
+            <item
+                android:id="@+id/logout"
+                android:icon="@drawable/logout"
+                android:title="Logout" />
+        </menu>
+    </item>
+</menu>

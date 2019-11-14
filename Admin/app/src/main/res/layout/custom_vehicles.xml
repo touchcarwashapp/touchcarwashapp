@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/layout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:background="@drawable/roundedcornerbackground">
+
+        <ImageView
+            android:id="@+id/image"
+            android:layout_width="100dp"
+            android:layout_height="75dp"
+            android:background="@drawable/nophoto"
+            android:scaleType="fitXY" />
+
+        <TextView
+            android:id="@+id/vehiclecompany"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5.0dip"
+            android:text="Aulto"
+            android:layout_toRightOf="@+id/image"
+            android:textColor="#ff000000" />
+
+        <ImageView
+            android:id="@+id/edit"
+            android:layout_width="20.0dip"
+            android:layout_height="20.0dip"
+            android:layout_margin="10.0dip"
+            android:layout_toLeftOf="@+id/delete"
+            android:layout_below="@+id/vehiclecompany"
+            android:src="@drawable/edit" />
+
+        <ImageView
+            android:id="@+id/delete"
+            android:layout_width="20.0dip"
+            android:layout_height="20.0dip"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/vehiclecompany"
+            android:layout_margin="10.0dip"
+            android:src="@drawable/delete" />
+
+    </RelativeLayout>
+</RelativeLayout>
