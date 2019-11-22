@@ -35,11 +35,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             db.addscreenwidth(width.toString() + "")
         }
 
-//        if (udb._userid.equals("", ignoreCase = true)) {
-//            startActivity(Intent(applicationContext, Registration::class.java))
-//            finish()
-//            return
-//        }
+        if (udb._userid.equals("", ignoreCase = true)) {
+            startActivity(Intent(applicationContext, Registration::class.java))
+            finish()
+            return
+        }
 
         val face = Typeface.createFromAsset(assets, "proxibold.otf")
 

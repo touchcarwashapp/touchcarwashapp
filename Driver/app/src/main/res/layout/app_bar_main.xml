@@ -37,7 +37,7 @@
                 android:layout_marginEnd="8dp"
                 android:layout_marginRight="8dp"
                 android:layout_marginBottom="8dp"
-                android:text="Driver Name"
+                android:text="Haneefa"
                 android:textColor="@android:color/white"
                 android:textSize="25sp"
                 android:textStyle="bold"
