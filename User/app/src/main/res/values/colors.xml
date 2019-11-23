@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#00574B</color>
-    <color name="colorAccent">#D81B60</color>
+    <color name="primaryColor">#9ccc65</color>
+    <color name="primaryLightColor">#cfff95</color>
+    <color name="primaryDarkColor">#6b9b37</color>
+    <color name="primaryTextColor">#000000</color>
+
+<!--    ui gradient-->
+    <color name="gradientTop">#134E5E</color>
+    <color name="gradientBottom">#71B280</color>
+
+    <!--    ui colors -->
+    <color name="lightGrey">#f9f9f9</color>
+    <color name="mediumGrey">#909090</color>
+    <color name="subHeads">#505050</color>
+    <color name="grey">#DCDCDC</color>
+    <color name="black">#000000</color>
+    <color name="white">#ffffff</color>
 </resources>

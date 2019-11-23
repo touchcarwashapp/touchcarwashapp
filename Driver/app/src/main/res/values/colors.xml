@@ -4,4 +4,18 @@
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
     <color name="blue">#4166b1</color>
+<!--gradients-->
+    <color name="gradientCenter">#4364F7</color>
+    <color name="gradientEnd">#6FB1FC</color>
+    <color name="gradientStart">#0052D4</color>
+<!--gradients-->
+<!--    ui colors -->
+    <color name="lightGrey">#f9f9f9</color>
+    <color name="mediumGrey">#909090</color>
+    <color name="subHeads">#505050</color>
+    <color name="lawnGreen">#32CD32</color>
+    <color name="grey">#DCDCDC</color>
+    <color name="lightBlueBg">#126FB1FC</color>
+    <color name="black">#000000</color>
+    <color name="white">#ffffff</color>
 </resources>
