@@ -1,4 +1,4 @@
-package com.touchcarwash_driver.Adapters
+package com.touchcarwash_driver.adapters
 
 
 import android.view.LayoutInflater
@@ -11,7 +11,7 @@ import java.util.*
 class ConfirmOrderAdapter(val bookingsList: ArrayList<String>, val click: (Int) -> Unit) :
         RecyclerView.Adapter<ConfirmOrderAdapter.ViewHolder>() {
     override fun onCreateViewHolder(p0: ViewGroup, p1: Int): ViewHolder {
-        val layout = LayoutInflater.from(p0.context).inflate(R.layout.static_confirm_card, p0, false)
+        val layout = LayoutInflater.from(p0.context).inflate(R.layout.static_pending_card, p0, false)
         return ViewHolder(layout)
     }
 

@@ -87,13 +87,29 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         sql.close();
         return link;
     }
+    public void user_updateradius(String radiouskm1) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(radiouskm, radiouskm1);
+        db.update(TABLE_name1, values, null, null);
+        db.close();
+    }
+
+    public void user_updateaddress(String address1,String location1) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(address, address1);
+        values.put(location, location1);
+        db.update(TABLE_name1, values, null, null);
+        db.close();
+    }
 
 
     public void addaddress(String address1,String location1,String radiouskm1) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(address, address1);
-        values.put(location, location1);
+        values.put(location, location1);  //lat,long
         values.put(radiouskm, radiouskm1);
         db.insert(TABLE_name1, null, values);
         db.close();
