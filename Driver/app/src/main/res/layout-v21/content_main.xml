@@ -273,6 +273,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerInParent="true"
+                        android:text="0"
                         android:visibility="gone"
                         android:textColor="@android:color/white"
                         android:textSize="22sp"
@@ -282,10 +283,10 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
-                    <ProgressBar
+                    <androidx.core.widget.ContentLoadingProgressBar
                         android:id="@+id/pendingLoader"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
                         android:layout_marginStart="8dp"
                         android:layout_marginLeft="8dp"
                         android:layout_marginTop="8dp"
@@ -340,6 +341,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerInParent="true"
+                        android:text="0"
                         android:visibility="gone"
                         android:textColor="@android:color/white"
                         android:textSize="22sp"
@@ -349,10 +351,10 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
-                    <ProgressBar
+                    <androidx.core.widget.ContentLoadingProgressBar
                         android:id="@+id/confirmLoading"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_marginLeft="8dp"
                         android:layout_marginTop="8dp"
