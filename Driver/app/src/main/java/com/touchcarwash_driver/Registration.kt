@@ -11,13 +11,15 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.FirebaseApp
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.iid.InstanceIdResult
+import com.touchcarwash_driver.db.UserDatabaseHandler
 import com.touchcarwash_driver.dto.res.RegRes
 import com.touchcarwash_driver.utils.tryToConnect
 import com.zemose.network.RetrofitClientInstance
 import com.zemose.network.UserService
 import es.dmoral.toasty.Toasty
 import kotlinx.android.synthetic.main.activity_registration.*
-import org.jetbrains.anko.longToast
+import org.jetbrains.anko.intentFor
+import org.jetbrains.anko.toast
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -78,57 +80,6 @@ class Registration : AppCompatActivity() {
             }
         }
     }
-//    inner class registration : AsyncTask<String, Void, String>() {
-//        public override fun onPreExecute() {
-//            register.isEnabled = false
-//        }
-//        public override fun doInBackground(vararg arg0: String): String {
-//            try {
-//                val link = Temp.weblink + "registration_driver.php"
-//                val data = (URLEncoder.encode("item", "UTF-8")
-//                        + "=" + URLEncoder.encode(txtname + ":%" + udb.getfcmid(), "UTF-8"))
-//                val url = URL(link)
-//                val conn = url.openConnection()
-//                conn.doOutput = true
-//                val wr = OutputStreamWriter(conn.getOutputStream())
-//                wr.write(data)
-//                wr.flush()
-//                val reader = BufferedReader(InputStreamReader(conn.getInputStream()))
-//                val sb = StringBuilder()
-//                var line: String? = null
-//                line = reader.readLine()
-//                while (line != null) {
-//                    sb.append(line)
-//                }
-//                return sb.toString()
-//            } catch (e: Exception) {
-//                val message = java.lang.StringBuilder("Unable to connect server! Please check your internet connection")
-//                return String(message)
-//            }
-//
-//        }
-//
-//        public override fun onPostExecute(result: String) {
-//            try {
-//                register.isEnabled = true
-//                pd.dismiss()
-//                if (result.trim { it <= ' ' }.contains(":%")) {
-//                    val k = result.trim { it <= ' ' }.split(":%".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
-//                    udb.adduser(k[0], k[1], k[2], k[3], k[4], k[5])
-//                    startActivity(Intent(applicationContext, MainActivity::class.java))
-//                    finish()
-//                    return
-//                } else if (result.contains("error")) {
-//                    Toasty.info(applicationContext, "Sorry !!! Please try later ", 0).show()
-//                } else {
-//                    Toasty.info(applicationContext, Temp.tempproblem, Toast.LENGTH_SHORT).show()
-//                }
-//            } catch (e: Exception) {
-//            }
-//
-//        }
-//    }
-
 
     private fun registerUser(mobile: String, fcmid: String) {
         try {
@@ -137,12 +88,13 @@ class Registration : AppCompatActivity() {
 
             call?.enqueue(object : Callback<RegRes> {
                 override fun onFailure(call: Call<RegRes>, t: Throwable) {
-                    Log.d("ooooo", "$t")
+                    toast("Please Try again Later")
                 }
 
                 override fun onResponse(call: Call<RegRes>, response: Response<RegRes>) {
-                    val body = response.body()
-                    Log.d("ttttt", "$response")
+                    val body = response.body()!!
+                    udb.adduser(body.data.sn,body.data.name,body.data.washvehicleid,body.data.registernumber,body.data.imgsig,body.data.driveimgsig,null,null,null)
+                    startActivity(intentFor<MainActivity>())
                 }
             })
         } catch (e: Exception) {
