@@ -42,11 +42,12 @@ import io.nlopez.smartlocation.SmartLocation
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.content_main.*
-import okhttp3.MediaType
+import kotlinx.android.synthetic.main.static_pending_card.view.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import org.jetbrains.anko.find
+import org.jetbrains.anko.intentFor
 import org.jetbrains.anko.toast
 import pl.aprilapps.easyphotopicker.DefaultCallback
 import pl.aprilapps.easyphotopicker.EasyImage
@@ -66,6 +67,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         //        var STORAGEPERMISSION = 1
         lateinit var progress: ProgressDialog
+        const val PENDING_ACTION = "PendingOrderAction"
+        const val CONFIRM_ACTION = "ConfirmOrderAction"
 //        const val FRONT_IMG_TITLE = "Pick Front Image"
 //        const val BACK_IMG_TITLE = "Pick Back Image"
 //        const val RIGHT_IMG_TITLE = "Pick Right-Side Image"
@@ -101,16 +104,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             return
         }
 
-        getJobs()
-
         val face = Typeface.createFromAsset(assets, "proxibold.otf")
 
         //setting up toolbar
         val toolbar = findViewById<Toolbar>(R.id.main_toolbar)
         setSupportActionBar(toolbar)
 
+        if(udb._isonline==""){
+            udb.addonlinestatus("0");
+        }
         //setting data from the udb
-
         if(udb._isonline == "" || udb._isonline == "0") {
             status.isOn = false
             status.labelOff = "Go Online"
@@ -131,10 +134,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             km.text = "Within " + udb._radiouskm + " Km radius"
         }
 
-        //setting driver image
-        Glide.with(this).load(Temp.weblink + "drivers/" + udb._userid + ".jpg")
-                .apply(RequestOptions.circleCropTransform().placeholder(R.drawable.placeholder).signature(ObjectKey(udb._userimgsig)))
-                .transition(DrawableTransitionOptions.withCrossFade()).into(driverpic)
+
 
         //setting driver name
         drivername.text = udb._username
@@ -157,7 +157,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         //setting isOnline status
         status.setOnToggledListener { toggleableView, isOn ->
-            var isOnline: String? = null
+            val isOnline: String?
             if (isOn) {
                 isOnline = "1"
             } else {
@@ -193,6 +193,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     radiusInp.error = "Please enter valid radius."
                 }
             }
+        }
+
+        pendingjobs.setOnClickListener {
+            startActivity(intentFor<CommonOrder>().setAction(PENDING_ACTION))
+        }
+
+        upcomingjobs.setOnClickListener {
+            startActivity(intentFor<CommonOrder>().setAction(CONFIRM_ACTION))
         }
 
 
@@ -235,7 +243,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 progress.setMessage("Removing Image...")
                 progress.setCancelable(false)
                 progress.show()
-//                deletepic()
+                deletePic()
             }
         }
         builder.show()
@@ -243,7 +251,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun deletePic() {
         val service = RetrofitClientInstance.retrofitInstance?.create(UserService::class.java)
-        val call = service?.removeProfilePhoto("application/x-www-form-urlencoded", udb._userid)
+        val call = service?.removeProfilePhoto("application/x-www-form-urlencoded", "removed",udb._userid)
         call?.enqueue(object : Callback<DefaultRes> {
             override fun onFailure(call: Call<DefaultRes>, t: Throwable) {
                 progress.dismiss()
@@ -266,9 +274,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         })
     }
 
-    private fun updateIsOnline(status: String) {
+    private fun updateIsOnline(isOnlineStat: String) {
         val service = RetrofitClientInstance.retrofitInstance?.create(UserService::class.java)
-        val call = service?.availabilityStatus("application/x-www-form-urlencoded", udb._userid, status)
+        val call = service?.availabilityStatus("application/x-www-form-urlencoded", udb._userid, isOnlineStat)
         call?.enqueue(object : Callback<DefaultRes> {
             override fun onFailure(call: Call<DefaultRes>, t: Throwable) {
                 progress.dismiss()
@@ -282,7 +290,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 if (status.equals("Success", ignoreCase = true)) {
                     progress.dismiss()
                     toast(result)
-                    udb.update_isonline(status)
+                    Log.d("tttttt", "$isOnlineStat")
+                    udb.update_isonline(isOnlineStat)
                 } else {
                     progress.dismiss()
                     toast(Temp.tempproblem)
@@ -293,6 +302,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun startLocation(context: Context) {
         progress.setMessage("Fetching your location")
+        progress.setCancelable(false)
         progress.show()
         if (SmartLocation.with(context).location().state().locationServicesEnabled()) {
             if (SmartLocation.with(context).location().state().isAnyProviderAvailable) {
@@ -324,6 +334,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun updateLocation(location: String, address: String) {
         progress.setMessage("updating location please wait..")
+        progress.setCancelable(false)
         progress.show()
         val service = RetrofitClientInstance.retrofitInstance?.create(UserService::class.java)
         val call = service?.updateLocation("application/x-www-form-urlencoded", udb._userid, address, location)
@@ -352,6 +363,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun updateRadius(radius: String, dialog: Dialog) {
         progress.setMessage("updating radius please wait..")
+        progress.setCancelable(false)
         progress.show()
         val service = RetrofitClientInstance.retrofitInstance?.create(UserService::class.java)
         val call = service?.updateRadius("application/x-www-form-urlencoded", udb._userid, radius)
@@ -380,7 +392,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun getJobs() {
         val service = RetrofitClientInstance.retrofitInstance?.create(UserService::class.java)
-        val call = service?.getJobs("application/x-www-form-urlencoded", udb._userid)
+        val call = service?.getJobsCount("application/x-www-form-urlencoded", udb._userid)
         call?.enqueue(object : Callback<JobsRes> {
             override fun onFailure(call: Call<JobsRes>, t: Throwable) {
 
@@ -404,7 +416,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         })
     }
 
-
     private fun uploadProfilePhoto(imagePath: String) {
         try {
             val myfile = File(imagePath)
@@ -424,7 +435,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 override fun onResponse(call: Call<DefaultRes>, response: Response<DefaultRes>) {
                     val body = response.body()
                     val status = body?.response?.status
-                    Log.d("ttttt", "$response, $body")
                     if (status.equals("Success", ignoreCase = true)) {
                         driverpic.setImageBitmap(BitmapFactory.decodeFile(imagePath))
                         udb.user_imgsigupdate(Date(System.currentTimeMillis()).toString())
@@ -806,7 +816,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
         (findViewById<View>(R.id.drawer_layout) as DrawerLayout).closeDrawer(GravityCompat.START)
         return true
     }
@@ -814,6 +823,20 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onStop() {
         super.onStop()
         stopLocation(this)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        //setting driver image
+        val rep = RequestOptions().placeholder(R.drawable.placeholder)
+        Glide.with(this)
+                .load("${Temp.weblink}driversmall/${udb._userid}.jpg")
+                .apply(rep)
+                .signature(ObjectKey(udb._userimgsig))
+                .into(driverpic)
+
+        //get jobs count
+        getJobs()
     }
 
 }

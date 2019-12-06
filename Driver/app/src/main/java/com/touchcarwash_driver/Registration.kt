@@ -88,13 +88,16 @@ class Registration : AppCompatActivity() {
 
             call?.enqueue(object : Callback<RegRes> {
                 override fun onFailure(call: Call<RegRes>, t: Throwable) {
+                    pd.dismiss()
                     toast("Please Try again Later")
                 }
 
                 override fun onResponse(call: Call<RegRes>, response: Response<RegRes>) {
+                    pd.dismiss()
                     val body = response.body()!!
                     udb.adduser(body.data.sn,body.data.name,body.data.washvehicleid,body.data.registernumber,body.data.imgsig,body.data.driveimgsig,null,null,null)
                     startActivity(intentFor<MainActivity>())
+                    finish()
                 }
             })
         } catch (e: Exception) {

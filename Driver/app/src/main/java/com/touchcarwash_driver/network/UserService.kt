@@ -1,5 +1,6 @@
 package com.zemose.network
 
+import com.touchcarwash_driver.dto.res.CommonJobsRes
 import com.touchcarwash_driver.dto.res.DefaultRes
 import com.touchcarwash_driver.dto.res.RegRes
 import com.touchcarwash_driver.dto.res.JobsRes
@@ -30,9 +31,10 @@ interface UserService {
 
     //remove photo
     @FormUrlEncoded
-    @POST("removePhoto.php")
+    @POST("updatedriverpic.php")
     fun removeProfilePhoto(
             @Header("Content-Type") contentType: String,
+            @Field("photoexist")photoExist: String,
             @Field("userId") userId: String): Call<DefaultRes>
 
 
@@ -61,16 +63,20 @@ interface UserService {
             @Field("userid") userId: String,
             @Field("radius") radius: String): Call<DefaultRes>
 
-    //get confirmed / pending jobs
+    //get confirmed / pending jobs count
     @FormUrlEncoded
     @POST("getdriver_pending_confirmed_jobs.php")
-    fun getJobs(
+    fun getJobsCount(
             @Header("Content-Type") contentType: String,
             @Field("userid") userId: String): Call<JobsRes>
 
+    //get pending jobs list
 
-
-
+    @FormUrlEncoded
+    @POST("driver_getpendingorder.php")
+    fun getJobsList(
+            @Header("Content-Type") contentType: String,
+            @Field("userid") userId: String): Call<CommonJobsRes>
 
 
 

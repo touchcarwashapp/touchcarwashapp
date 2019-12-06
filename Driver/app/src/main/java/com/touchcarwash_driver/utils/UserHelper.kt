@@ -8,7 +8,6 @@ import android.graphics.drawable.ColorDrawable
 import android.location.Geocoder
 import android.view.Window
 import androidx.core.app.ActivityCompat
-import com.touchcarwash_driver.R
 import java.util.*
 
 object UserHelper {
