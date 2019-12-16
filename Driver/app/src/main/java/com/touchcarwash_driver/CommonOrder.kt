@@ -2,6 +2,8 @@ package com.touchcarwash_driver
 
 import android.app.ProgressDialog
 import android.os.Bundle
+import android.util.Log
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -32,11 +34,9 @@ class CommonOrder : AppCompatActivity() {
         pd = ProgressDialog(this)
 
         when (intent.action) {
-
             MainActivity.PENDING_ACTION -> {
                 fetchPendingJobs()
             }
-
             MainActivity.CONFIRM_ACTION -> {
                 fetchConfirmedJobs()
             }
@@ -47,7 +47,7 @@ class CommonOrder : AppCompatActivity() {
 
     private fun fetchConfirmedJobs() {
         val service = RetrofitClientInstance.retrofitInstance?.create(UserService::class.java)
-        val call = service?.getJobsList("application/x-www-form-urlencoded", udb._userid)
+        val call = service?.getConfirmedList("application/x-www-form-urlencoded", udb._userid)
         call?.enqueue(object : Callback<CommonJobsRes> {
             override fun onFailure(call: Call<CommonJobsRes>, t: Throwable) {
                 pd.dismiss()
@@ -68,7 +68,11 @@ class CommonOrder : AppCompatActivity() {
                                         element.vehicledetails.custvehicleimgsig,
                                         element.washtypes as ArrayList<CommonJobsRes.Data.Washtype>,
                                         element.accessories as ArrayList<CommonJobsRes.Data.Accessory>,
-                                        element.totalamount
+                                        element.totalamount,
+                                        element.orderdetails.orderid,
+                                        element.location,
+                                        element.customerDetails.contact1,
+                                        element.customerDetails.contact2
                                 ))
                     }
 
@@ -84,7 +88,7 @@ class CommonOrder : AppCompatActivity() {
 
     private fun fetchPendingJobs() {
         val service = RetrofitClientInstance.retrofitInstance?.create(UserService::class.java)
-        val call = service?.getJobsList("application/x-www-form-urlencoded", udb._userid)
+        val call = service?.getPendingList("application/x-www-form-urlencoded", udb._userid)
         call?.enqueue(object : Callback<CommonJobsRes> {
             override fun onFailure(call: Call<CommonJobsRes>, t: Throwable) {
                 pd.dismiss()
@@ -111,7 +115,8 @@ class CommonOrder : AppCompatActivity() {
                                         element.customerDetails.place,
                                         element.customerDetails.contact1,
                                         element.customerDetails.contact2,
-                                        element.customerDetails.pincode
+                                        element.customerDetails.pincode,
+                                        element.orderdetails.orderid
                                 ))
                     }
 
@@ -127,22 +132,36 @@ class CommonOrder : AppCompatActivity() {
 
     private fun displayPendingJobs(jobs: ArrayList<PendingOrder>) {
         orderHead.text = "Pending Orders"
-        backBtn.setOnClickListener {onBackPressed()}
-        jobsListRecycler.layoutManager = LinearLayoutManager(this,RecyclerView.VERTICAL, false)
-        val adapter = PendingOrderAdapter(jobs) { pos ->
-            toast("$pos")
+        if (jobs.isNotEmpty()) {
+            jobsListRecycler.visibility = View.VISIBLE
+            backBtn.setOnClickListener { onBackPressed() }
+            jobsListRecycler.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
+            val adapter = PendingOrderAdapter(jobs) { pos ->
+                toast("$pos")
+            }
+            jobsListRecycler.adapter = adapter
+        } else {
+            emptyLayoutContainer.visibility = View.VISIBLE
         }
-        jobsListRecycler.adapter = adapter
+
+
     }
 
     private fun displayConfirmedJobs(jobs: ArrayList<ConfirmOrder>) {
+        emptyText.text = "You have no confirmed orders.."
         orderHead.text = "Confirmed Orders"
-        backBtn.setOnClickListener {onBackPressed()}
-        jobsListRecycler.layoutManager = LinearLayoutManager(this,RecyclerView.VERTICAL, false)
-        val adapter = ConfirmedOrderAdapter(jobs) { pos ->
+        if (jobs.isNotEmpty()) {
+            jobsListRecycler.visibility = View.VISIBLE
+            backBtn.setOnClickListener { onBackPressed() }
+            jobsListRecycler.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
+            val adapter = ConfirmedOrderAdapter(jobs) { pos ->
 
+            }
+            jobsListRecycler.adapter = adapter
+        } else {
+            emptyLayoutContainer.visibility = View.VISIBLE
         }
-        jobsListRecycler.adapter = adapter
+
     }
 
 }

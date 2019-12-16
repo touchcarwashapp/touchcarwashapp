@@ -40,7 +40,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/customerName"
+            android:id="@+id/extraAmount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -165,7 +165,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/phone"
+            android:id="@+id/grandTotal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -227,7 +227,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/alternatePhone"
+            android:id="@+id/received"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"

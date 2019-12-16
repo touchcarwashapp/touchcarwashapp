@@ -1,6 +1,5 @@
 package com.touchcarwash_driver
 
-import Helpers.DecodePolyline
 import android.animation.ValueAnimator
 import android.content.Context
 import android.content.pm.PackageManager
@@ -9,18 +8,23 @@ import android.os.Bundle
 import android.view.animation.LinearInterpolator
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import com.beust.klaxon.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.touchcarwash_driver.adapters.PendingOrderAdapter
+import com.touchcarwash_driver.dto.res.DirectionRes
+import com.touchcarwash_driver.network.DirectionInterface
+import com.touchcarwash_driver.utils.DecodePolyline
 import com.touchcarwash_driver.utils.UserHelper
+import com.touchcarwash_driver.utils.tryToConnect
+import com.zemose.network.GmapRetrofitInstance
 import io.nlopez.smartlocation.SmartLocation
-import org.jetbrains.anko.doAsync
+import io.reactivex.SingleObserver
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import org.jetbrains.anko.toast
-import org.jetbrains.anko.uiThread
-import java.net.URL
 import java.util.*
 
 
@@ -30,43 +34,31 @@ class MapActivity : AppCompatActivity() {
         const val MAP_REQUEST_LOCATION = 3782
     }
 
-    // declare bounds object to fit whole route in screen
+    private lateinit var mMap: GoogleMap
     private lateinit var polyOptions: PolylineOptions
     private lateinit var blackPolyOptions: PolylineOptions
     private lateinit var blackPolyline: Polyline
     private lateinit var greyPolyline: Polyline
     private lateinit var polyLineList: List<LatLng>
     private lateinit var marker: Marker
-    lateinit var confirmMap: SupportMapFragment
+    private lateinit var driverLoc: LatLng
+    private lateinit var customerLoc: LatLng
     val pattern_polyline_dotted_black = Arrays.asList(Gap(10f), Dash(20f))
     val pattern_polyline_dotted_grey = Arrays.asList(Gap(5f), Dash(10f))
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map)
-
-
-        //get present location of driver
         checkLocation()
-        //get customer location through intents
-
-
-        confirmMap = supportFragmentManager.findFragmentById(R.id.confirm_map) as SupportMapFragment
-
-
     }
 
-    private fun getMapUrl(from: LatLng, to: LatLng): String {
-        val origin = "origin=${from.latitude},${from.longitude}"
-        val dest = "destination=${to.latitude},${to.longitude}"
-        val sensor = "sensor=false"
-        val params = "$origin&$dest&$sensor&key=${getString(R.string.mapKey)}"
-        return "https://maps.googleapis.com/maps/api/directions/json?$params"
-    }
 
     private fun checkLocation() {
         if (UserHelper.hasPermissions(this, MainActivity.PERMISSIONS)) {
-            startLocation(this)
+            tryToConnect {
+                startLocation(this)
+            }
         } else {
             ActivityCompat.requestPermissions(this, MainActivity.PERMISSIONS, MainActivity.REQUEST_LOCATION)
         }
@@ -80,12 +72,12 @@ class MapActivity : AppCompatActivity() {
                         .location()
                         .oneFix()
                         .start { p0 ->
-                            val driverLoc = LatLng(p0.latitude, p0.longitude)
+                            driverLoc = LatLng(p0.latitude, p0.longitude)
                             val custLat = intent?.getStringExtra(PendingOrderAdapter.CUST_MAP_LAT)?.toDouble()
                             val custLng = intent?.getStringExtra(PendingOrderAdapter.CUST_MAP_LNG)?.toDouble()
                             if (custLat != null && custLng != null) {
-                                val customerLoc = LatLng(custLat, custLng)
-                                initialiseMap(confirmMap, driverLoc, customerLoc)
+                                customerLoc = LatLng(custLat, custLng)
+                                initialiseMap()
                             }
                         }
             }
@@ -98,9 +90,12 @@ class MapActivity : AppCompatActivity() {
         SmartLocation.with(context).location().stop()
     }
 
-    private fun initialiseMap(confirmMap: SupportMapFragment, driverLoc: LatLng, customerLoc: LatLng) {
-        confirmMap.getMapAsync { mMap ->
 
+    private fun initialiseMap() {
+
+        val confirmMap = supportFragmentManager.findFragmentById(R.id.confirm_map) as SupportMapFragment
+        confirmMap.getMapAsync { it ->
+            mMap = it
             //setting up options
             mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.uber_map_style))
             mMap.mapType = GoogleMap.MAP_TYPE_NORMAL
@@ -122,27 +117,41 @@ class MapActivity : AppCompatActivity() {
                     )
             )
 
-            // get the google api direction ur for getting polyline objects
-            val url = getMapUrl(driverLoc, customerLoc)
+            // fetch the latlanglist from the direction api
 
-            doAsync {
-                val result = URL(url).readText()
-                uiThread {
-                    val parser = Parser()
-                    val stringBuilder = StringBuilder(result)
-                    val json = parser.parse(stringBuilder) as JsonObject
-                    val routes = json.array<JsonObject>("routes")!!
-                    val legs = routes[0]["legs"] as JsonArray<JsonObject>
-                    val points = legs[0]["steps"] as JsonArray<JsonObject>
-                    polyLineList = points.flatMap { DecodePolyline().decodePoly(it.obj("polyline")?.string("points")!!) }
+            val service =
+                    GmapRetrofitInstance.retrofitInstance?.create(DirectionInterface::class.java)
+            val call = service?.getDirection(
+                    "driving",
+                    "${driverLoc.latitude},${driverLoc.longitude}",
+                    "${customerLoc.latitude},${customerLoc.longitude}",
+                    getString(R.string.mapKey)
+            )
+            call?.subscribeOn(Schedulers.io())
+                    ?.observeOn(AndroidSchedulers.mainThread())
+                    ?.subscribe(object : SingleObserver<DirectionRes> {
 
-                    drawPolyLineAndAnimateCar(mMap, driverLoc)
-                }
-            }
+                        override fun onSuccess(t: DirectionRes) {
+                            for (route in t.routes) {
+                                val points = route.overviewPolyline.points
+                                polyLineList = DecodePolyline.decodePoly(points)
+                                drawPolyLineAndAnimateCar()
+                            }
+                        }
+
+                        override fun onSubscribe(d: Disposable) {
+                            // data of polyline here too
+                        }
+
+                        override fun onError(e: Throwable) {
+                            // error message here
+                        }
+
+                    })
         }
     }
 
-    private fun drawPolyLineAndAnimateCar(mMap: GoogleMap, driverLoc: LatLng) {
+    private fun drawPolyLineAndAnimateCar() {
         //adjusting bounds
         val builder = LatLngBounds.builder() // declaring builder
         for (latLng in polyLineList)
@@ -182,7 +191,7 @@ class MapActivity : AppCompatActivity() {
                         .position(polyLineList.get(polyLineList.size - 1))
                         .title("Customer")
                         .snippet("Customer located here..")
-                        .anchor(0.5f,0.5f)
+                        .anchor(0.5f, 0.5f)
                         .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_car))
         )
 
@@ -205,13 +214,13 @@ class MapActivity : AppCompatActivity() {
         }
         polyLineAnimator.start() //start the animator
 
-        marker = mMap.addMarker( //setting another marker with current location as position and icon
+        marker = mMap.addMarker( //setting marker with current location as position and icon
                 MarkerOptions()
                         .position(driverLoc)
                         .title("You")
                         .snippet("Driver located here..")
                         .flat(true)
-                        .anchor(0.5f,0.5f)
+                        .anchor(0.5f, 0.5f)
                         .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_driver))
         )
     }
@@ -228,7 +237,9 @@ class MapActivity : AppCompatActivity() {
         when (requestCode) {
             MAP_REQUEST_LOCATION -> {
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults.isNotEmpty()) {
-                    startLocation(this)
+                    tryToConnect {
+                        startLocation(this)
+                    }
                 }
             }
         }

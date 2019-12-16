@@ -15,8 +15,10 @@ import android.os.Environment
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import android.widget.*
-import com.touchcarwash_driver.db.UserDatabaseHandler
+import android.widget.Button
+import android.widget.ImageView
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -26,15 +28,17 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.signature.ObjectKey
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import com.google.firebase.FirebaseApp
+import com.touchcarwash_driver.db.UserDatabaseHandler
 import com.touchcarwash_driver.dto.res.DefaultRes
 import com.touchcarwash_driver.dto.res.JobsRes
 import com.touchcarwash_driver.utils.UserHelper
+import com.touchcarwash_driver.utils.tryToConnect
 import com.yalantis.ucrop.UCrop
 import com.zemose.network.RetrofitClientInstance
 import com.zemose.network.UserService
@@ -42,7 +46,6 @@ import io.nlopez.smartlocation.SmartLocation
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.content_main.*
-import kotlinx.android.synthetic.main.static_pending_card.view.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -64,32 +67,22 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val PERMISSIONS =
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
         const val REQUEST_LOCATION = 1005
-
-        //        var STORAGEPERMISSION = 1
-        lateinit var progress: ProgressDialog
         const val PENDING_ACTION = "PendingOrderAction"
         const val CONFIRM_ACTION = "ConfirmOrderAction"
-//        const val FRONT_IMG_TITLE = "Pick Front Image"
-//        const val BACK_IMG_TITLE = "Pick Back Image"
-//        const val RIGHT_IMG_TITLE = "Pick Right-Side Image"
-//        const val LEFT_IMG_TITLE = "Pick Left-Side Image"
-//        const val TOP_IMG_TITLE = "Pick Top Image"
-//        const val FRONT_IMG_INT = 1
-//        const val BACK_IMG_INT = 2
-//        const val RIGHT_IMG_INT = 3
-//        const val LEFT_IMG_INT = 4
-//        const val TOP_IMG_INT = 5
-
         const val STORAGEPERMISSION = 79
     }
 
-    private var imgName = ""
+    private val PERMISSIONS =
+            arrayOf(Manifest.permission.CALL_PHONE)
+    private val REQUEST_CALL_CODE = 2050
+    lateinit var progress: ProgressDialog
     private var udb = UserDatabaseHandler(this)
-    lateinit var imageDialog: Dialog
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        FirebaseApp.initializeApp(this)
 
         progress = ProgressDialog(this)
 
@@ -99,7 +92,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
 
         if (udb._userid.equals("", ignoreCase = true)) {
-            startActivity(Intent(applicationContext, Registration::class.java))
+            startActivity(Intent(applicationContext, RegistrationActivity::class.java))
             finish()
             return
         }
@@ -110,11 +103,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val toolbar = findViewById<Toolbar>(R.id.main_toolbar)
         setSupportActionBar(toolbar)
 
-        if(udb._isonline==""){
+        if (udb._isonline == "") {
             udb.addonlinestatus("0");
         }
         //setting data from the udb
-        if(udb._isonline == "" || udb._isonline == "0") {
+        if (udb._isonline == "" || udb._isonline == "0") {
             status.isOn = false
             status.labelOff = "Go Online"
         } else {
@@ -128,13 +121,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             addressTv.text = udb._address
         }
 
-        if(udb._radiouskm.isNullOrEmpty()) {
+        if (udb._radiouskm.isNullOrEmpty()) {
             km.text = "Radius not available"
         } else {
             km.text = "Within " + udb._radiouskm + " Km radius"
         }
-
-
 
         //setting driver name
         drivername.text = udb._username
@@ -151,25 +142,22 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         (navigationView.getHeaderView(0).findViewById<View>(R.id.txthelp) as TextView).setTypeface(face)
         navigationView.setNavigationItemSelectedListener(this)
 
-        driverpic.setOnClickListener {
-            checkDriverImgPermission("Profile Photo")
-        }
+        driverpic.setOnClickListener { checkDriverImgPermission("Profile Photo") }
 
         //setting isOnline status
-        status.setOnToggledListener { toggleableView, isOn ->
-            val isOnline: String?
-            if (isOn) {
-                isOnline = "1"
+        status.setOnToggledListener { _, isOn ->
+            val isOnline: String = if (isOn) {
+                "1"
             } else {
-                isOnline = "0"
+                "0"
             }
-            //update is online within server
-            updateIsOnline(isOnline)
+            tryToConnect {
+                //update is online within server
+                updateIsOnline(isOnline)
+            }
         }
 
-        editaddress.setOnClickListener {
-            checkLocation()
-        }
+        editaddress.setOnClickListener { checkLocation() }
 
         editkm.setOnClickListener {
             //create dialog
@@ -184,7 +172,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             radiusBtn.setOnClickListener {
                 if (!radius.text.isNullOrEmpty()) {
                     if (!radius.text.toString().contains(Regex("/[a-zA-Z*()&^%\$#@!<>?\"{}:|]/g"))) {
-                        updateRadius(radius.text.toString(), dialog)
+                        tryToConnect {
+                            updateRadius(radius.text.toString(), dialog)
+                        }
                     } else {
                         radiusInp.error = "Please enter numeric value"
                     }
@@ -243,7 +233,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 progress.setMessage("Removing Image...")
                 progress.setCancelable(false)
                 progress.show()
-                deletePic()
+                tryToConnect {
+                    //delete pic server
+                    deletePic()
+                }
             }
         }
         builder.show()
@@ -251,7 +244,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun deletePic() {
         val service = RetrofitClientInstance.retrofitInstance?.create(UserService::class.java)
-        val call = service?.removeProfilePhoto("application/x-www-form-urlencoded", "removed",udb._userid)
+        val call = service?.removeProfilePhoto("application/x-www-form-urlencoded", "removed", udb._userid)
         call?.enqueue(object : Callback<DefaultRes> {
             override fun onFailure(call: Call<DefaultRes>, t: Throwable) {
                 progress.dismiss()
@@ -264,7 +257,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 val result = body?.data!!
                 if (status.equals("Success", ignoreCase = true)) {
                     progress.dismiss()
-                    driverpic.setImageDrawable(resources.getDrawable(R.drawable.placeholder));
+                    removeProfilePic("/driverProfile/")
+                    driverpic.setImageDrawable(resources.getDrawable(R.drawable.placeholder))
+                    udb.user_imgsigupdate(System.currentTimeMillis().toString())
                     toast(result)
                 } else {
                     progress.dismiss();
@@ -290,7 +285,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 if (status.equals("Success", ignoreCase = true)) {
                     progress.dismiss()
                     toast(result)
-                    Log.d("tttttt", "$isOnlineStat")
                     udb.update_isonline(isOnlineStat)
                 } else {
                     progress.dismiss()
@@ -311,7 +305,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         .oneFix()
                         .start { p0 ->
                             val address = UserHelper.getCompleteAddressString(p0.latitude, p0.longitude, this)
-                            updateLocation("${p0.latitude},${p0.longitude}", address)
+                            tryToConnect {
+                                updateLocation("${p0.latitude},${p0.longitude}", address)
+                            }
                         }
             }
         } else {
@@ -451,290 +447,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
-
-//    private fun showDialog() {
-//        val dialogWidth = resources.displayMetrics.widthPixels * 0.9F
-//        val dialogHeight = resources.displayMetrics.heightPixels * 0.9F
-//
-//        imageDialog = Dialog(this)
-//        imageDialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-//        imageDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-//        imageDialog.setCancelable(false)
-//        imageDialog.setContentView(R.layout.dialog_image_upload)
-//        imageDialog.window?.setLayout(dialogWidth.toInt(), dialogHeight.toInt())
-//        imageDialog.show()
-//
-//        val frontImg = imageDialog.findViewById<ImageView>(R.id.frontImage)
-//        val backImg = imageDialog.findViewById<ImageView>(R.id.backImage)
-//        val rightImg = imageDialog.findViewById<ImageView>(R.id.sideRightImage)
-//        val leftImg = imageDialog.findViewById<ImageView>(R.id.sideLeftImage)
-//        val topImg = imageDialog.findViewById<ImageView>(R.id.topImage)
-//
-//        frontImg.setOnClickListener {
-//            checkImgPermission(FRONT_IMG_TITLE, 1)
-//        }
-//
-//        backImg.setOnClickListener {
-//            checkImgPermission(BACK_IMG_TITLE, 2)
-//        }
-//
-//        rightImg.setOnClickListener {
-//            checkImgPermission(RIGHT_IMG_TITLE, 3)
-//        }
-//
-//        leftImg.setOnClickListener {
-//            checkImgPermission(LEFT_IMG_TITLE, 4)
-//        }
-//
-//        topImg.setOnClickListener {
-//            checkImgPermission(TOP_IMG_TITLE, 5)
-//        }
-//
-//    }
-
-//    fun checkImgPermission(title: String, type: Int) {
-//        STORAGEPERMISSION = type
-//        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-//            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), STORAGEPERMISSION)
-//        } else {
-//            val folder =
-//                    File(Environment.getExternalStorageDirectory().toString() + "/CarWashImages")
-//            if (!folder.exists()) {
-//                folder.mkdir()
-//                val f1 =
-//                        File(Environment.getExternalStorageDirectory().toString() + "/CarWashImages" + "/" + ".nomedia")
-//                try {
-//                    f1.createNewFile()
-//                } catch (e: IOException) {
-//                    e.printStackTrace()
-//                }
-//            }
-//
-//            selectImage(title)
-//        }
-//    }
-
-//    fun selectImage(title: String) {
-//        val options = arrayOf<CharSequence>("Remove Photo", "Take Photo", "Choose from Gallery", "Cancel")
-//        val builder = AlertDialog.Builder(this)
-//        builder.setTitle(title)
-//        builder.setItems(options) { dialog, item ->
-//            if (options[item] == "Take Photo") {
-//                when(title) {
-//                    FRONT_IMG_TITLE -> { EasyImage.openCamera(this, FRONT_IMG_INT) }
-//                    BACK_IMG_TITLE -> { EasyImage.openCamera(this, BACK_IMG_INT) }
-//                    RIGHT_IMG_TITLE -> { EasyImage.openCamera(this, RIGHT_IMG_INT) }
-//                    LEFT_IMG_TITLE -> { EasyImage.openCamera(this, LEFT_IMG_INT) }
-//                    TOP_IMG_TITLE -> { EasyImage.openCamera(this, TOP_IMG_INT) }
-//                }
-//
-//            } else if (options[item] == "Choose from Gallery") {
-//
-//                when(title) {
-//                    FRONT_IMG_TITLE -> { EasyImage.openGallery(this, FRONT_IMG_INT) }
-//                    BACK_IMG_TITLE -> { EasyImage.openGallery(this, BACK_IMG_INT) }
-//                    RIGHT_IMG_TITLE -> { EasyImage.openGallery(this, RIGHT_IMG_INT) }
-//                    LEFT_IMG_TITLE -> { EasyImage.openGallery(this, LEFT_IMG_INT) }
-//                    TOP_IMG_TITLE -> { EasyImage.openGallery(this, TOP_IMG_INT) }
-//                }
-//            } else if (options[item] == "Cancel") {
-//                dialog.dismiss()
-//            } else if (options[item] == "Remove Photo") {
-////                progress.setMessage("Removing Image...")
-////                progress.setCancelable(false)
-////                progress.show()
-//
-//                val frontImg = imageDialog.findViewById<ImageView>(R.id.frontImage)
-//                val backImg = imageDialog.findViewById<ImageView>(R.id.backImage)
-//                val rightImg = imageDialog.findViewById<ImageView>(R.id.sideRightImage)
-//                val leftImg = imageDialog.findViewById<ImageView>(R.id.sideLeftImage)
-//                val topImg = imageDialog.findViewById<ImageView>(R.id.topImage)
-//
-//                when(title) {
-//                    FRONT_IMG_TITLE -> {
-//                        frontImg.setImageBitmap(null)
-//                    }
-//
-//                    BACK_IMG_TITLE -> {
-//                        backImg.setImageBitmap(null)
-//                    }
-//
-//                    RIGHT_IMG_TITLE -> {
-//                        rightImg.setImageBitmap(null)
-//                    }
-//
-//                    LEFT_IMG_TITLE -> {
-//                        leftImg.setImageBitmap(null)
-//                    }
-//
-//                    TOP_IMG_TITLE -> {
-//                        topImg.setImageBitmap(null)
-//                    }
-//                }
-//
-////                deletepic()
-//            }
-//        }
-//        builder.show()
-//    }
-
-//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-//        super.onActivityResult(requestCode, resultCode, data)
-//
-//        EasyImage.handleActivityResult(requestCode, resultCode, data, this, object : DefaultCallback() {
-//
-//            override fun onImagePickerError(e: Exception?, source: EasyImage.ImageSource?, type: Int) {}
-//
-//            override fun onImagePicked(imageFile: File, source: EasyImage.ImageSource, type: Int) {
-//
-//                when(type) {
-//                    1 -> {
-//                        imgName = "FR.jpg"
-//                    }
-//
-//                    2 -> {
-//                        imgName = "BA.jpg"
-//                    }
-//
-//                    3 -> {
-//                        imgName = "RS.jpg"
-//                    }
-//
-//                    4 -> {
-//                        imgName = "LS.jpg"
-//                    }
-//
-//                    5 -> {
-//                        imgName = "TP.jpg"
-//                    }
-//                }
-//
-//                val f: File? =
-//                        File(Environment.getExternalStorageDirectory().toString() + "/CarWashImages" + "/" + imgName)
-//                try {
-//                    f?.createNewFile()
-//                } catch (ex: IOException) {
-//
-//                }
-//                if (f != null) {
-//                    try {
-//                        val uri = Uri.fromFile(f)
-//                        val options = UCrop.Options()
-//                        options.setToolbarColor(resources.getColor(R.color.gradientCenter))
-//                        options.setStatusBarColor(resources.getColor(R.color.gradientCenter))
-//                        options.setCompressionFormat(Bitmap.CompressFormat.JPEG)
-//                        options.setCompressionQuality(80)
-//                        options.setToolbarTitle("Crop Image")
-//                        UCrop.of(Uri.fromFile(imageFile), uri)
-//                                .withOptions(options)
-//                                .withAspectRatio(4f, 3f)
-//                                .start(this@MainActivity)
-//                    } catch (a: Exception) {
-//                        Toast.makeText(applicationContext, Log.getStackTraceString(a), Toast.LENGTH_LONG).show();
-//                    }
-//                }
-//            }
-//        })
-//
-//
-//        when (requestCode) {
-//            UCrop.REQUEST_CROP -> {
-//                try {
-//                    val imagePath = UCrop.getOutput(data!!)!!.path
-//                    Log.d("ooooo", "$imagePath ::::: $imgName")
-//                    progress.setMessage("Uploading image...")
-//                    progress.setCancelable(false)
-//                    progress.show()
-//                    //update image to server
-//
-//
-//                    // set image to view
-//                    val frontImg = imageDialog.findViewById<ImageView>(R.id.frontImage)
-//                    val backImg = imageDialog.findViewById<ImageView>(R.id.backImage)
-//                    val rightImg = imageDialog.findViewById<ImageView>(R.id.sideRightImage)
-//                    val leftImg = imageDialog.findViewById<ImageView>(R.id.sideLeftImage)
-//                    val topImg = imageDialog.findViewById<ImageView>(R.id.topImage)
-//
-//                    when(imgName) {
-//
-//                        "FR.jpg" -> {
-//                            frontImg.setImageBitmap(BitmapFactory.decodeFile(imagePath))
-//                            progress.dismiss()
-//                        }
-//
-//                        "BA.jpg" -> {
-//                            backImg.setImageBitmap(BitmapFactory.decodeFile(imagePath))
-//                            progress.dismiss()
-//                        }
-//
-//                        "RS.jpg" -> {
-//                            rightImg.setImageBitmap(BitmapFactory.decodeFile(imagePath))
-//                            progress.dismiss()
-//                        }
-//
-//                        "LS.jpg" -> {
-//                            leftImg.setImageBitmap(BitmapFactory.decodeFile(imagePath))
-//                            progress.dismiss()
-//                        }
-//
-//                        "TP.jpg" -> {
-//                            topImg.setImageBitmap(BitmapFactory.decodeFile(imagePath))
-//                            progress.dismiss()
-//                        }
-//
-//                    }
-//
-//                } catch (a: Exception) {
-//
-//                }
-//            }
-//        }
-//    }
-//
-//    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-//
-//        when (requestCode) {
-//            STORAGEPERMISSION -> {
-//                val folder = File(Environment.getExternalStorageDirectory().toString() + "/CarWashImages")
-//                if (!folder.exists()) {
-//                    folder.mkdir()
-//                    val f1 =
-//                            File(Environment.getExternalStorageDirectory().toString() + "/CarWashImages" + "/" + ".nomedia")
-//                    try {
-//                        f1.createNewFile()
-//                    } catch (e: IOException) {
-//                        e.printStackTrace()
-//                    }
-//                }
-//
-//                when (requestCode) {
-//                    1 -> {
-//                        selectImage(FRONT_IMG_TITLE)
-//                    }
-//
-//                    2 -> {
-//                        selectImage(BACK_IMG_TITLE)
-//                    }
-//
-//                    3 -> {
-//                        selectImage(RIGHT_IMG_TITLE)
-//                    }
-//
-//                    4 -> {
-//                        selectImage(LEFT_IMG_TITLE)
-//                    }
-//
-//                    5 -> {
-//                        selectImage(TOP_IMG_TITLE)
-//                    }
-//                }
-//            }
-//        }
-//
-//    }
-
-
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
@@ -750,13 +462,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         e.printStackTrace()
                     }
                 }
-
                 selectImage("Profile Photo")
             }
 
             REQUEST_LOCATION -> {
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults.isNotEmpty()) {
                     startLocation(this)
+                }
+            }
+
+            REQUEST_CALL_CODE -> {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults.isNotEmpty()) {
+                    makePhoneCall("+917998999996")
                 }
             }
         }
@@ -806,8 +523,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     progress.setMessage("Uploading image...")
                     progress.setCancelable(false)
                     progress.show()
-                    //update image to server
-                    uploadProfilePhoto(imagePath!!)
+                    tryToConnect {
+                        //update image to server
+                        uploadProfilePhoto(imagePath!!)
+                    }
                 } catch (a: Exception) {
 
                 }
@@ -817,7 +536,85 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         (findViewById<View>(R.id.drawer_layout) as DrawerLayout).closeDrawer(GravityCompat.START)
+
+        when (item.itemId) {
+
+            R.id.myprofile -> {
+                startActivity(intentFor<MainActivity>()
+                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            }
+
+            R.id.myjobs -> {
+                startActivity(intentFor<CommonOrder>().setAction(CONFIRM_ACTION))
+            }
+
+            R.id.managegallery -> {
+                startActivity(intentFor<GalleryActivity>())
+            }
+
+            R.id.accounts -> {
+                startActivity(intentFor<AccountActivity>())
+            }
+
+            R.id.rpt_update -> {
+                appUpdate()
+            }
+
+            R.id.admin -> {
+                makePhoneCall("+917998999996")
+            }
+
+            R.id.logout -> {
+                udb.deleteuser()
+                startActivity(intentFor<RegistrationActivity>()
+                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            }
+        }
         return true
+    }
+
+    private fun makePhoneCall(phone: String) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, PERMISSIONS, REQUEST_CALL_CODE)
+        } else {
+            AlertDialog.Builder(this)
+                    .setTitle("Are you sure you want to call administrator ?")
+                    .setPositiveButton("yes") { _, _ ->
+                        val callIntent = Intent(Intent.ACTION_CALL)
+                        callIntent.data = Uri.parse("tel:$phone")
+                        startActivity(callIntent)
+                    }
+                    .setNegativeButton("cancel") { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    .show()
+        }
+    }
+
+    private fun appUpdate() {
+        val appPackageName = this.packageName
+        try {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$appPackageName")));
+        } catch (e: android.content.ActivityNotFoundException) {
+            startActivity(Intent (Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$appPackageName")));
+        }
+    }
+
+    private fun removeProfilePic(directoryPath:String) {
+        val folder = File(Environment.getExternalStorageDirectory().toString() + directoryPath)
+        val images = if (folder.exists()) {
+            folder.listFiles { _, name ->
+                name.endsWith(".jpg")
+            }
+        } else {
+            arrayOf(File(""))
+        }
+        for (i in images) {
+            val image = File(Environment.getExternalStorageDirectory().toString() + directoryPath + i.name)
+            image.delete()
+        }
     }
 
     override fun onStop() {
@@ -835,8 +632,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 .signature(ObjectKey(udb._userimgsig))
                 .into(driverpic)
 
-        //get jobs count
-        getJobs()
+        tryToConnect {
+            //get jobs count
+            getJobs()
+        }
     }
 
 }

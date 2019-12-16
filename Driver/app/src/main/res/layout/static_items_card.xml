@@ -20,12 +20,33 @@
         android:text="POWER WASH"
         android:textAllCaps="true"
         android:textColor="@color/subHeads"
-        android:textSize="16sp"
+        android:textSize="14sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/price"
         app:layout_constraintEnd_toStartOf="@+id/price"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/price" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/itemType"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="4dp"
+        android:text="Types"
+        android:textAllCaps="true"
+        android:textColor="@color/subHeads"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/price"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/itemName" />
 
     <TextView
         android:id="@+id/price"
@@ -37,14 +58,13 @@
         android:layout_marginBottom="8dp"
         android:text="300"
         android:textColor="@android:color/black"
-        android:textSize="20sp"
+        android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -79,7 +79,7 @@
                 app:layout_constraintTop_toTopOf="parent">
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/itemRecycler"
+                    android:id="@+id/paymentRecycler"
                     android:layout_width="match_parent"
                     android:layout_height="200dp"
                     android:layout_marginStart="8dp"
@@ -87,6 +87,7 @@
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
+                    android:nestedScrollingEnabled="false"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -102,7 +103,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/itemRecycler"
+                    app:layout_constraintTop_toBottomOf="@+id/paymentRecycler"
                     app:layout_constraintVertical_bias="0.0" />
 
                 <TextView
@@ -113,7 +114,7 @@
                     android:layout_marginLeft="8dp"
                     android:layout_marginEnd="16dp"
                     android:layout_marginRight="16dp"
-                    android:text="total :"
+                    android:text="net total :"
                     android:textAllCaps="true"
                     android:textSize="16sp"
                     android:textStyle="bold"
@@ -166,9 +167,10 @@
                 app:layout_constraintVertical_bias="0.0">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/customerName"
+                    android:id="@+id/extraAmount"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
                     android:layout_marginStart="8dp"
                     android:layout_marginLeft="8dp"
                     android:layout_marginTop="8dp"
@@ -204,6 +206,7 @@
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
+                    android:inputType="numberDecimal"
                     android:hint="Discount" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -224,8 +227,8 @@
                 app:layout_constraintTop_toBottomOf="@+id/discountInputLayout"
                 app:layout_constraintVertical_bias="0.0">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/phone"
+                <EditText
+                    android:id="@+id/grandTotal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
@@ -233,6 +236,8 @@
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
+                    android:textColor="@android:color/black"
+                    android:editable="false"
                     android:hint="Grand Total" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -255,7 +260,7 @@
                 app:layout_constraintVertical_bias="0.0">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/alternatePhone"
+                    android:id="@+id/received"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
@@ -263,6 +268,7 @@
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
+                    android:inputType="numberDecimal"
                     android:hint="Received" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -292,6 +298,7 @@
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
+                    android:editable="false"
                     android:hint="Balance" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -309,7 +316,7 @@
                 android:background="@drawable/rounded_confirm_btn_green"
                 android:paddingLeft="15dp"
                 android:paddingRight="15dp"
-                android:text="FINISH"
+                android:text="PAY &amp; FINISH"
                 android:textAllCaps="true"
                 android:textColor="@android:color/white"
                 android:textSize="18sp"

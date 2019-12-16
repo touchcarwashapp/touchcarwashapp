@@ -10,10 +10,6 @@
             android:icon="@drawable/myjobs"
             android:title="My Jobs" />
         <item
-            android:id="@+id/myavailability"
-            android:icon="@drawable/availaibility"
-            android:title="My Availability" />
-        <item
             android:id="@+id/managegallery"
             android:icon="@drawable/gallery"
             android:title="Manage Gallery" />
@@ -25,10 +21,6 @@
     </group>
     <item android:title="Communicate">
         <menu>
-            <item
-                android:id="@+id/notificationissue"
-                android:icon="@drawable/notierror"
-                android:title="Notification Issue ?" />
             <item
                 android:id="@+id/rpt_update"
                 android:icon="@drawable/update"

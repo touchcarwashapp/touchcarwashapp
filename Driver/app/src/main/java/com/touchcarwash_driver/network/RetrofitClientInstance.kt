@@ -14,7 +14,7 @@ object RetrofitClientInstance {
     get() {
 
         if (retrofit == null) {
-            retrofit = retrofit2.Retrofit.Builder()
+            retrofit = Retrofit.Builder()
                     .baseUrl(Temp.weblink)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()

@@ -13,20 +13,30 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 
-
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:usesCleartextTraffic="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true">
+        <activity
+            android:name=".GalleryActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".AccountActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".UploadImagesActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".PaymentActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".WashTypeListActivity"
             android:screenOrientation="portrait"
@@ -38,17 +48,12 @@
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden" />
         <activity
-            android:name=".WashActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateHidden" />
-        <activity
             android:name=".StartTrackingActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden" />
         <activity
-            android:name=".ConfirmedListActivity"
+            android:name=".TrackingDetailActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden" />
@@ -64,14 +69,14 @@
             android:name=".MapActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateHidden"></activity>
+            android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".CommonOrder"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden" />
         <activity
-            android:name=".Registration"
+            android:name=".RegistrationActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden" />

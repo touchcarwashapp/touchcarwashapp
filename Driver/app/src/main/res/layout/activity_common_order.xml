@@ -57,6 +57,7 @@
         android:id="@+id/jobsListRecycler"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:visibility="gone"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
@@ -67,5 +68,66 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/paymentToolBar" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/emptyLayoutContainer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        android:background="@drawable/white_shadow"
+        android:layout_marginStart="0dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginEnd="0dp"
+        android:layout_marginRight="0dp"
+        android:layout_marginBottom="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/paymentToolBar" >
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/emptyImg"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.25"
+            app:lottie_autoPlay="true"
+            app:lottie_fileName="empty_box.json"
+            app:lottie_loop="true" />
+
+        <TextView
+            android:id="@+id/emptyText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:text="You have no pending orders.."
+            android:textAlignment="center"
+            android:textColor="@color/subHeads"
+            android:textSize="16sp"
+            android:textStyle="italic"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/emptyImg"
+            app:layout_constraintWidth_percent="0.7" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -8,6 +8,8 @@ import android.graphics.drawable.ColorDrawable
 import android.location.Geocoder
 import android.view.Window
 import androidx.core.app.ActivityCompat
+import com.touchcarwash_driver.R
+import java.text.DecimalFormat
 import java.util.*
 
 object UserHelper {
@@ -54,6 +56,19 @@ object UserHelper {
             it.show()
         }
 
+    }
+
+    fun convertToPrice(ctx:Context, value: Double): String {
+        val formatter = if (value == 0.0) {
+            DecimalFormat("###,###,###0.00")
+        }  else {
+            DecimalFormat("###,###,###.00")
+        }
+        return "${ctx.getString(R.string.currencySymbol)} ${formatter.format(value)}"
+    }
+
+    fun trimCurrency(value: String): Double {
+        return (value.split(" ")[1]).toDouble()
     }
 
 }
