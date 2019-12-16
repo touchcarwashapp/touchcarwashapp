@@ -24,14 +24,13 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class Registration : AppCompatActivity() {
+class RegistrationActivity : AppCompatActivity() {
 
     lateinit var pd: ProgressDialog
     private var udb = UserDatabaseHandler(this)
 
     companion object {
         const val PERMISSION_ALL = 1
-
         fun hasPermissions(context: Context?, vararg permissions: String): Boolean {
             if (context != null) {
                 for (permission in permissions) {
@@ -52,7 +51,6 @@ class Registration : AppCompatActivity() {
         text.text = Temp.apptitle
         mobile.typeface = face
         register.typeface = face
-        FirebaseApp.initializeApp(this)
         val PERMISSIONS = arrayOf(android.Manifest.permission.INTERNET, android.Manifest.permission.WRITE_EXTERNAL_STORAGE, android.Manifest.permission.READ_EXTERNAL_STORAGE, android.Manifest.permission.ACCESS_NETWORK_STATE, android.Manifest.permission.CALL_PHONE, android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION)
 
         if (!hasPermissions(this, *PERMISSIONS)) {
@@ -88,13 +86,16 @@ class Registration : AppCompatActivity() {
 
             call?.enqueue(object : Callback<RegRes> {
                 override fun onFailure(call: Call<RegRes>, t: Throwable) {
+                    pd.dismiss()
                     toast("Please Try again Later")
                 }
 
                 override fun onResponse(call: Call<RegRes>, response: Response<RegRes>) {
+                    pd.dismiss()
                     val body = response.body()!!
-                    udb.adduser(body.data.sn,body.data.name,body.data.washvehicleid,body.data.registernumber,body.data.imgsig,body.data.driveimgsig,null,null,null)
+                    udb.adduser(body.data.sn, body.data.name, body.data.washvehicleid, body.data.registernumber, body.data.imgsig, body.data.driveimgsig, null, null, null)
                     startActivity(intentFor<MainActivity>())
+                    finish()
                 }
             })
         } catch (e: Exception) {

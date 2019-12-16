@@ -6,14 +6,17 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.util.ArrayList;
+
 public class UserDatabaseHandler extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "touchudb_driver";
-    private static final int DATABASE_VERSION = 12;
+    private static final int DATABASE_VERSION = 14;
     private static final String TABLE_name1 = "user";
     private static final String TABLE_name2 = "fcmid";
     private static final String TABLE_name3 = "onlinestatus";
     private static final String TABLE_name4 = "scwidth";
+    private static final String TABLE_name5 = "currentlocation";
 
     private static final String screenwidth = "screenwidth";
     private static final String fcmid = "fcmid";
@@ -31,11 +34,17 @@ public class UserDatabaseHandler extends SQLiteOpenHelper {
 
     private static final String isonline= "isonline";
 
+    private static final String washvehicleid="washvehicleid";
+    private static final String lat="lat";
+    private static final String lng="lng";
+    private static final String orderid="orderid";
 
     private static String CREATE_TABLE1 = "CREATE TABLE " + TABLE_name1 + "("+pkey +" INTEGER PRIMARY KEY AUTOINCREMENT,"+userid+" TEXT,"+username+" TEXT,"+vehicleid+" TEXT,"+vehicleregno+" TEXT,"+vehicleimgisg+" TEXT,"+userimgisg+" TEXT,"+workaddress+" TEXT,"+worklocation+" TEXT,"+radiouskm+" TEXT"+")";
     private static String CREATE_TABLE2= "CREATE TABLE " + TABLE_name2 + "("+pkey +" INTEGER PRIMARY KEY AUTOINCREMENT,"+fcmid+" TEXT"+")";
     private static String CREATE_TABLE3 = "CREATE TABLE " + TABLE_name3+ "("+pkey +" INTEGER PRIMARY KEY AUTOINCREMENT,"+isonline+" TEXT"+")";
     private static String CREATE_TABLE4 = "CREATE TABLE " + TABLE_name4+ "("+pkey +" INTEGER PRIMARY KEY AUTOINCREMENT,"+screenwidth+" TEXT"+")";
+    private static String CREATE_TABLE5= "CREATE TABLE " + TABLE_name5 + "("+pkey +" INTEGER PRIMARY KEY AUTOINCREMENT,"+washvehicleid+" TEXT,"+lat+" TEXT,"+lng+" TEXT,"+orderid+" TEXT"+")";
+
     public UserDatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -45,6 +54,7 @@ public class UserDatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE2);
         db.execSQL(CREATE_TABLE3);
         db.execSQL(CREATE_TABLE4);
+        db.execSQL(CREATE_TABLE5);
     }
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -52,6 +62,7 @@ public class UserDatabaseHandler extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS "+TABLE_name2);
         db.execSQL("DROP TABLE IF EXISTS "+TABLE_name3);
         db.execSQL("DROP TABLE IF EXISTS "+TABLE_name4);
+        db.execSQL("DROP TABLE IF EXISTS "+TABLE_name5);
         onCreate(db);
     }
 
@@ -60,7 +71,44 @@ public class UserDatabaseHandler extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS "+TABLE_name2);
         db.execSQL("DROP TABLE IF EXISTS "+TABLE_name3);
         db.execSQL("DROP TABLE IF EXISTS "+TABLE_name4);
+        db.execSQL("DROP TABLE IF EXISTS "+TABLE_name5);
         onCreate(db);
+    }
+
+    public void addvehcilelocation(String washvehicleid1,String lat1,String lng1,String orderid1) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(washvehicleid, washvehicleid1);
+        values.put(lat, lat1);
+        values.put(lng, lng1);
+        values.put(orderid, orderid1);
+        db.insert(TABLE_name5, null, values);
+        db.close();
+    }
+
+    public ArrayList<String> get_vehcilelocation(){
+
+        ArrayList<String> arraylist = new ArrayList<String>();
+        SQLiteDatabase sql=this.getReadableDatabase();
+        String query = "SELECT  * FROM " + TABLE_name5;
+
+        Cursor c=sql.rawQuery(query,null);
+        while(c.moveToNext()) {
+            arraylist.add(c.getString(0));
+            arraylist.add(c.getString(1));
+            arraylist.add(c.getString(2));
+            arraylist.add(c.getString(3));
+            arraylist.add(c.getString(4));
+        }
+        c.close();
+        return arraylist;
+    }
+
+    public void delete_vehcilelocation(String pkey1)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_name5, pkey+"="+pkey1, null);
+
     }
 
    /*User DEtails DB */

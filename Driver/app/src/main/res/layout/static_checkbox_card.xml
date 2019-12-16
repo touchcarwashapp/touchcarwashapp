@@ -4,10 +4,11 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/white_shadow"
+    android:layout_marginBottom="3dp"
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/washTypeHead"
+        android:id="@+id/itemName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -18,14 +19,14 @@
         android:text="wash type"
         android:textAllCaps="true"
         android:textColor="@color/subHeads"
-        android:textSize="16sp"
+        android:textSize="14sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@+id/checkWash"
+        app:layout_constraintEnd_toStartOf="@+id/checkBox"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/washTypes"
+        android:id="@+id/itemDesc"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -36,14 +37,14 @@
         android:layout_marginBottom="8dp"
         android:text="power wash, hydraulic wash, soft wash, heat wash"
         android:textAllCaps="true"
-        android:textSize="14sp"
+        android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/checkWash"
+        app:layout_constraintEnd_toStartOf="@+id/checkBox"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/washTypeHead" />
+        app:layout_constraintTop_toBottomOf="@+id/itemName" />
 
     <CheckBox
-        android:id="@+id/checkWash"
+        android:id="@+id/checkBox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"

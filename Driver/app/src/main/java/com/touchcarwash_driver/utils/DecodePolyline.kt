@@ -1,8 +1,8 @@
-package Helpers
+package com.touchcarwash_driver.utils
 
 import com.google.android.gms.maps.model.LatLng
 
-internal class DecodePolyline() {
+internal object DecodePolyline {
     internal fun decodePoly(encoded: String): List<LatLng> {
         val poly = ArrayList<LatLng>()
         var index = 0
