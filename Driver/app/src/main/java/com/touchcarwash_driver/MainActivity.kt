@@ -306,7 +306,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         .start { p0 ->
                             val address = UserHelper.getCompleteAddressString(p0.latitude, p0.longitude, this)
                             tryToConnect {
-                                updateLocation("${p0.latitude},${p0.longitude}", address)
+                                updateLocation(p0.latitude.toString(), p0.longitude.toString(), address)
                             }
                         }
             }
@@ -328,12 +328,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     }
 
-    private fun updateLocation(location: String, address: String) {
+    private fun updateLocation(workLatitude: String, workLongitude: String, address: String) {
         progress.setMessage("updating location please wait..")
         progress.setCancelable(false)
         progress.show()
         val service = RetrofitClientInstance.retrofitInstance?.create(UserService::class.java)
-        val call = service?.updateLocation("application/x-www-form-urlencoded", udb._userid, address, location)
+        val call = service?.updateLocation("application/x-www-form-urlencoded", udb._userid, address, workLatitude, workLongitude)
         call?.enqueue(object : Callback<DefaultRes> {
             override fun onFailure(call: Call<DefaultRes>, t: Throwable) {
                 progress.dismiss()
@@ -343,11 +343,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 val body = response.body()
                 val status = body?.response?.status
                 val result = body?.data!!
-
                 if (status.equals("Success", ignoreCase = true)) {
                     progress.dismiss()
                     toast(result)
-                    udb.user_updateaddress(address, location)
+                    udb.user_updateaddress(address, "$workLatitude,$workLongitude")
                     addressTv.text = "$address"
                 } else {
                     progress.dismiss();
@@ -598,11 +597,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         try {
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$appPackageName")));
         } catch (e: android.content.ActivityNotFoundException) {
-            startActivity(Intent (Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$appPackageName")));
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$appPackageName")));
         }
     }
 
-    private fun removeProfilePic(directoryPath:String) {
+    private fun removeProfilePic(directoryPath: String) {
         val folder = File(Environment.getExternalStorageDirectory().toString() + directoryPath)
         val images = if (folder.exists()) {
             folder.listFiles { _, name ->

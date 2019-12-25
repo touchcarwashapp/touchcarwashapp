@@ -44,6 +44,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "792699996489-07kuv4313vgfm2ae50me6pnasnqp1us1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.touchcarwash_user",
+            "certificate_hash": "7aa85d6b7f3b181954d973f9c163d805cb82328f"
+          }
+        },
+        {
           "client_id": "792699996489-r5hho1rm25va6267tcterf5com0qhl0t.apps.googleusercontent.com",
           "client_type": 3
         }
