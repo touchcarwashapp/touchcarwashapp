@@ -50,8 +50,7 @@ interface UserService {
             @Header("Content-Type") contentType: String,
             @Field("userid") userId: String,
             @Field("workaddress") address: String,
-            @Field("worklat") workLat: String,
-            @Field("worklng") workLng: String): Call<DefaultRes>
+            @Field("worklocation") location: String): Call<DefaultRes>
 
     //update radius
     @FormUrlEncoded

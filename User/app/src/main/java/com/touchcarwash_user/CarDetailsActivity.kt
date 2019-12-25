@@ -3,10 +3,10 @@ package com.touchcarwash_user
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 
-class AccountActivity : AppCompatActivity() {
+class CarDetailsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_account)
+        setContentView(R.layout.activity_car_details)
     }
 }
